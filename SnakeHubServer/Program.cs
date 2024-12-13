@@ -17,7 +17,14 @@ namespace SnakeHubServer
 
             // Add services to the container.
 
-            builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));
+            if (builder.Environment.IsDevelopment())
+            {
+                builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            }
+            else
+            {
+                builder.Services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            }
 
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
