@@ -134,7 +134,7 @@ namespace SnakeHubServer.Model.Game.Snake
                 GameObjects.Add(player.Id, obj);
                 GameObjectOnCollisionedActions.Add(obj, player =>
                 {
-                    if (PlayerSettings[player].Body.Count == PlayerSettings[player].Body.Distinct().Count())
+                    if (obj == GameObjects[player.Id] && PlayerSettings[player].Body.Count == PlayerSettings[player].Body.Distinct().Count())
                     {
                         return;
                     }
