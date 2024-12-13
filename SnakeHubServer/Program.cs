@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,7 +17,6 @@ namespace SnakeHubServer
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             if (builder.Environment.IsDevelopment())
             {
                 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -60,7 +60,6 @@ namespace SnakeHubServer
                 });
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -70,13 +69,12 @@ namespace SnakeHubServer
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseHttpsRedirection();
-
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
 
+            // Seed the Admin role
             using (IServiceScope scope = app.Services.CreateScope())
             {
                 IServiceProvider services = scope.ServiceProvider;
@@ -85,16 +83,17 @@ namespace SnakeHubServer
                     RoleManager<IdentityRole> roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                     if (!await roleManager.RoleExistsAsync("admin"))
                     {
-                        await roleManager.CreateAsync(new("admin"));
+                        await roleManager.CreateAsync(new IdentityRole("admin"));
                     }
                 }
                 catch (Exception ex)
                 {
                     ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occured while seeding Admin role.");
+                    logger.LogError(ex, "An error occurred while seeding Admin role.");
                 }
             }
 
+            // Start the application
             app.Run();
         }
     }
