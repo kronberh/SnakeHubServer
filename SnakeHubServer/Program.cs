@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -66,15 +65,17 @@ namespace SnakeHubServer
             WebApplication app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
 
-            // Seed the Admin role
             using (IServiceScope scope = app.Services.CreateScope())
             {
                 IServiceProvider services = scope.ServiceProvider;
@@ -93,7 +94,6 @@ namespace SnakeHubServer
                 }
             }
 
-            // Start the application
             app.Run();
         }
     }
