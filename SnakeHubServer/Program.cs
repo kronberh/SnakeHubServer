@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using SnakeHubServer.Data;
 using SnakeHubServer.Model;
 using SnakeHubServer.Service;
-using System.Net;
 using System.Text;
 
 namespace SnakeHubServer
@@ -17,6 +16,7 @@ namespace SnakeHubServer
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
             if (builder.Environment.IsDevelopment())
             {
                 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -34,8 +34,8 @@ namespace SnakeHubServer
                 options.Password.RequireUppercase = false;
                 options.Password.RequiredLength = 1;
             })
-            .AddEntityFrameworkStores<ApplicationContext>()
-            .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<ApplicationContext>()
+                .AddDefaultTokenProviders();
 
             builder.Services.AddSingleton<GameSessionsService>();
             builder.Services.AddScoped<JwtService>();
@@ -45,34 +45,31 @@ namespace SnakeHubServer
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidateLifetime = true,
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty))
-                };
-            });
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidateLifetime = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty))
+                    };
+                });
 
             builder.Services.AddControllers();
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             WebApplication app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
-            // Configure Kestrel to listen on HTTP and HTTPS
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
@@ -94,7 +91,7 @@ namespace SnakeHubServer
                 catch (Exception ex)
                 {
                     ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred while seeding Admin role.");
+                    logger.LogError(ex, "An error occured while seeding Admin role.");
                 }
             }
 
