@@ -19,12 +19,10 @@ namespace SnakeHubServer
 
             if (builder.Environment.IsDevelopment())
             {
-                Console.WriteLine("Using MSSQL DB");
                 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             }
             else
             {
-                Console.WriteLine("Using Postgred DB");
                 builder.Services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
             }
 
@@ -73,6 +71,10 @@ namespace SnakeHubServer
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+            }
+            else
+            {
+                app.UseHsts();
             }
 
             app.UseHttpsRedirection();
